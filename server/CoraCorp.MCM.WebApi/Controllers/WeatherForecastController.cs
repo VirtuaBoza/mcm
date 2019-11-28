@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CoraCorp.MCM.WebApi.Controllers
 {
@@ -24,8 +24,11 @@ namespace CoraCorp.MCM.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "read:works")]
         public IEnumerable<WeatherForecast> Get()
         {
+            var something = User.IsInRole("read:works");
+            var a = User.Claims;
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

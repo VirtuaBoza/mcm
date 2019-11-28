@@ -1,10 +1,12 @@
 using CoraCorp.MCM.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CoraCorp.MCM.WebApi
 {
@@ -26,6 +28,20 @@ namespace CoraCorp.MCM.WebApi
             {
                 options.UseSqlServer(Configuration.GetConnectionString("MCM"));
             });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = "https://coracorp.auth0.com/";
+                options.Audience = "http://localhost:65425";
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    RoleClaimType = "permissions",
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +55,8 @@ namespace CoraCorp.MCM.WebApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
